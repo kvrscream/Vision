@@ -44,18 +44,24 @@ class HomeController {
     RegExp moneyRegex = RegExp(r"^[1-9]\d{0,2}(\.\d{3})*,\d{2}$");
 
     final inputImage = InputImage.fromFilePath(path);
-    final textDetector = GoogleMlKit.vision.textDetectorV2();
+    final textDetector = GoogleMlKit.vision.textDetector();
 
-    final RecognisedText recognisedText =
-        await textDetector.processImage(inputImage);
+    try {
+      final RecognisedText recognisedText =
+          await textDetector.processImage(inputImage);
 
-    for (TextBlock block in recognisedText.blocks) {
-      for (TextLine item in block.lines) {
-        labels.add(item.text);
-        // if (dateRegex.hasMatch(item.text) || moneyRegex.hasMatch(item.text)) {
-        //   labels.add(item.text);
-        // }
+      for (TextBlock block in recognisedText.blocks) {
+        for (TextLine item in block.lines) {
+          labels.add(item.text);
+          // if (dateRegex.hasMatch(item.text) || moneyRegex.hasMatch(item.text)) {
+          //   labels.add(item.text);
+          // }
+        }
       }
+
+      return;
+    } catch (erro) {
+      print("Erro TxtRecognition " + erro.toString());
     }
   }
 }
