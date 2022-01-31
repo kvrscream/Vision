@@ -39,9 +39,13 @@ class HomeController {
   Future<void> TextRecognitor(String path) async {
     resultado = "";
     labels = <String>[];
-    RegExp dateRegex = RegExp(
-        r'^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
-    RegExp moneyRegex = RegExp(r"^[1-9]\d{0,2}(\.\d{3})*,\d{2}$");
+    RegExp dateRegex = RegExp(r'\\d{2}\\/\\d{2}\\/\\d{4}');
+    RegExp moneyRegex = RegExp(r"[1-9]\d{0,2}(\.\d{3})*,\d{2}$");
+
+    RegExp cnpjRegex =
+        RegExp(r'[0-9]{2}\.?[0-9]{3}\.?[0-9]{3}\/?[0-9]{4}\-?[0-9]{2}');
+
+    RegExp cpfRegex = RegExp(r'[0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2}');
 
     final inputImage = InputImage.fromFilePath(path);
     final textDetector = GoogleMlKit.vision.textDetector();
@@ -52,10 +56,21 @@ class HomeController {
 
       for (TextBlock block in recognisedText.blocks) {
         for (TextLine item in block.lines) {
-          labels.add(item.text);
-          // if (dateRegex.hasMatch(item.text) || moneyRegex.hasMatch(item.text)) {
-          //   labels.add(item.text);
-          // }
+          if (cnpjRegex.hasMatch(item.text)) {
+            labels.add("CNPJ: " + item.text);
+          }
+
+          if (cpfRegex.hasMatch(item.text)) {
+            labels.add("CPF: " + item.text);
+          }
+
+          if (dateRegex.hasMatch(item.text)) {
+            labels.add("Data: " + item.text);
+          }
+
+          if (moneyRegex.hasMatch(item.text)) {
+            labels.add("Valor: " + item.text);
+          }
         }
       }
 
